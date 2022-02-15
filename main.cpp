@@ -1,7 +1,7 @@
 // Copyright © SixtyFPS GmbH <info@sixtyfps.io>
 // SPDX-License-Identifier: (GPL-3.0-only OR LicenseRef-SixtyFPS-commercial)
 
-#include "scene.h"
+#include <slint_interpreter.h>
 
 #include <iostream>
 #include <stdlib.h>
@@ -40,7 +40,7 @@ static GLint compile_shader(GLuint program, GLuint shader_type, const GLchar *co
 class OpenGLAlphaOverlay
 {
 public:
-    OpenGLAlphaOverlay(slint::ComponentWeakHandle<App> app) : app_weak(app) { }
+    OpenGLAlphaOverlay(slint::ComponentWeakHandle<slint::interpreter::ComponentInstance> app) : app_weak(app) { }
 
     void operator()(slint::RenderingState state, slint::GraphicsAPI)
     {
@@ -106,7 +106,7 @@ private:
         auto app = app_weak.lock();
         if (!app)
             return;
-        if (!(*app)->get_enable_alpha_mask()) {
+        if (!*(*app)->get_property("enable-alpha-mask")->to_bool()) {
             return;
         }
         glDisable(GL_BLEND);
@@ -120,14 +120,45 @@ private:
 
     void teardown() { glDeleteProgram(program); }
 
-    slint::ComponentWeakHandle<App> app_weak;
+    slint::ComponentWeakHandle<slint::interpreter::ComponentInstance> app_weak;
     GLuint program = 0;
     GLuint position_location = 0;
 };
 
 int main()
 {
-    auto app = App::create();
+    slint::interpreter::ComponentCompiler compiler;
+    auto def = compiler.build_from_source(R"slint(
+import { ScrollView, Button, CheckBox, SpinBox, Slider, GroupBox, LineEdit, StandardListView,
+    ComboBox, HorizontalBox, VerticalBox, GridBox, TabWidget, TextEdit, AboutSixtyFPS } from "std-widgets.slint";
+
+App := Window {
+    preferred-width: 500px;
+    preferred-height: 600px;
+    title: "OpenGL Overlay Alpha Mask Example";
+    property <bool> enable-alpha-mask <=> alpha-mask-toggle.checked;
+
+    VerticalBox {
+        HorizontalBox {
+            Text {
+                text: "This text and the checkbox is rendered using SixtyFPS";
+                wrap: word-wrap;
+            }
+
+            VerticalLayout {
+                alignment: start;
+                alpha-mask-toggle := CheckBox {
+                    checked: true;
+                    text: "Enable Alpha Mask";
+                }
+            }
+        }
+
+        Rectangle {}
+    }
+}
+    )slint", "");
+    auto app = def->create();
 
     app->window().set_opaque_background(true);
     app->window().set_rendering_notifier(OpenGLAlphaOverlay(app));

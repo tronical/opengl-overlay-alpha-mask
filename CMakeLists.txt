@@ -11,4 +11,3 @@ find_package(OpenGLES2 REQUIRED)
 
 add_executable(opengl_overlay main.cpp)
 target_link_libraries(opengl_overlay PRIVATE Slint::Slint OpenGLES2::OpenGLES2)
-slint_target_sources(opengl_overlay scene.slint)
