@@ -40,20 +40,20 @@ static GLint compile_shader(GLuint program, GLuint shader_type, const GLchar *co
 class OpenGLAlphaOverlay
 {
 public:
-    OpenGLAlphaOverlay(sixtyfps::ComponentWeakHandle<App> app) : app_weak(app) { }
+    OpenGLAlphaOverlay(slint::ComponentWeakHandle<App> app) : app_weak(app) { }
 
-    void operator()(sixtyfps::RenderingState state)
+    void operator()(slint::RenderingState state, slint::GraphicsAPI)
     {
         switch (state) {
-        case sixtyfps::RenderingState::RenderingSetup:
+        case slint::RenderingState::RenderingSetup:
             setup();
             break;
-        case sixtyfps::RenderingState::BeforeRendering:
+        case slint::RenderingState::BeforeRendering:
             break;
-        case sixtyfps::RenderingState::AfterRendering:
+        case slint::RenderingState::AfterRendering:
             after();
             break;
-        case sixtyfps::RenderingState::RenderingTeardown:
+        case slint::RenderingState::RenderingTeardown:
             teardown();
             break;
         }
@@ -120,7 +120,7 @@ private:
 
     void teardown() { glDeleteProgram(program); }
 
-    sixtyfps::ComponentWeakHandle<App> app_weak;
+    slint::ComponentWeakHandle<App> app_weak;
     GLuint program = 0;
     GLuint position_location = 0;
 };
@@ -129,6 +129,7 @@ int main()
 {
     auto app = App::create();
 
+    app->window().set_opaque_background(true);
     app->window().set_rendering_notifier(OpenGLAlphaOverlay(app));
 
     app->run();

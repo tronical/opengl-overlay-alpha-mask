@@ -6,9 +6,9 @@ project(opengl_overlay_cpp LANGUAGES CXX)
 
 list(PREPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-find_package(SixtyFPS REQUIRED)
+find_package(Slint REQUIRED)
 find_package(OpenGLES2 REQUIRED)
 
 add_executable(opengl_overlay main.cpp)
-target_link_libraries(opengl_overlay PRIVATE SixtyFPS::SixtyFPS OpenGLES2::OpenGLES2)
-sixtyfps_target_60_sources(opengl_overlay scene.60)
+target_link_libraries(opengl_overlay PRIVATE Slint::Slint OpenGLES2::OpenGLES2)
+slint_target_sources(opengl_overlay scene.slint)
