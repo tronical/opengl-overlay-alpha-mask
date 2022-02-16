@@ -137,30 +137,33 @@ App := Window {
     preferred-height: 600px;
     title: "OpenGL Overlay Alpha Mask Example";
     property <bool> enable-alpha-mask <=> alpha-mask-toggle.checked;
+    background: transparent; // Make sure an ARGB surface is allocated
+    Rectangle {
+        background: white;
 
-    VerticalBox {
-        HorizontalBox {
-            Text {
-                text: "This text and the checkbox is rendered using SixtyFPS";
-                wrap: word-wrap;
-            }
+        VerticalBox {
+            HorizontalBox {
+                Text {
+                    text: "This text and the checkbox is rendered using SixtyFPS";
+                    wrap: word-wrap;
+                }
 
-            VerticalLayout {
-                alignment: start;
-                alpha-mask-toggle := CheckBox {
-                    checked: true;
-                    text: "Enable Alpha Mask";
+                VerticalLayout {
+                    alignment: start;
+                    alpha-mask-toggle := CheckBox {
+                        checked: true;
+                        text: "Enable Alpha Mask";
+                    }
                 }
             }
-        }
 
-        Rectangle {}
+            Rectangle {}
+        }
     }
 }
     )slint", "");
     auto app = def->create();
 
-    app->window().set_opaque_background(true);
     app->window().set_rendering_notifier(OpenGLAlphaOverlay(app));
 
     app->run();
