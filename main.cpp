@@ -111,10 +111,14 @@ private:
         }
         glDisable(GL_BLEND);
         glUseProgram(program);
+        glEnableVertexAttribArray(position_location);
+        GLint old_buffer_binding = 0;
+        glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &old_buffer_binding);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
         const float vertices[] = { 0.5, 1.0, 0.0, 0.0, 1.0, 0.0 };
         glVertexAttribPointer(position_location, 2, GL_FLOAT, GL_FALSE, 0, vertices);
-        glEnableVertexAttribArray(position_location);
         glDrawArrays(GL_TRIANGLES, 0, 3);
+        glBindBuffer(GL_ARRAY_BUFFER, old_buffer_binding);
         glEnable(GL_BLEND);
     }
 
