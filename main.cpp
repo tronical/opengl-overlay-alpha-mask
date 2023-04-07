@@ -140,7 +140,7 @@ export component App inherits Window {
     preferred-width: 500px;
     preferred-height: 600px;
     title: "OpenGL Overlay Alpha Mask Example";
-    property <bool> enable-alpha-mask <=> alpha-mask-toggle.checked;
+    out property <bool> enable-alpha-mask <=> alpha-mask-toggle.checked;
     background: transparent; // Make sure an ARGB surface is allocated
     Rectangle {
         background: white;
