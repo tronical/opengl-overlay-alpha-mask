@@ -134,9 +134,9 @@ int main()
     slint::interpreter::ComponentCompiler compiler;
     auto def = compiler.build_from_source(R"slint(
 import { ScrollView, Button, CheckBox, SpinBox, Slider, GroupBox, LineEdit, StandardListView,
-    ComboBox, HorizontalBox, VerticalBox, GridBox, TabWidget, TextEdit, AboutSixtyFPS } from "std-widgets.slint";
+    ComboBox, HorizontalBox, VerticalBox, GridBox, TabWidget, TextEdit, AboutSlint } from "std-widgets.slint";
 
-App := Window {
+export component App inherits Window {
     preferred-width: 500px;
     preferred-height: 600px;
     title: "OpenGL Overlay Alpha Mask Example";
@@ -166,6 +166,13 @@ App := Window {
     }
 }
     )slint", "");
+    if (!def) {
+        std::cerr << "Error compiling component" << std::endl;
+        for (auto &&diag: compiler.diagnostics()) {
+            std::cerr << diag.source_file << ":" << diag.line << ":" << diag.column << ":" << diag.message << std::endl;
+        }
+        return EXIT_FAILURE;
+    }
     auto app = def->create();
 
     app->window().set_rendering_notifier(OpenGLAlphaOverlay(app));
