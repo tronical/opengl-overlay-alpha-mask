@@ -99,6 +99,7 @@ private:
         glDetachShader(program, vertex_shader_id);
 
         position_location = glGetAttribLocation(program, "position");
+        glGenBuffers(1, &vertex_buffer_object);
     }
 
     void after()
@@ -114,19 +115,21 @@ private:
         glEnableVertexAttribArray(position_location);
         GLint old_buffer_binding = 0;
         glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &old_buffer_binding);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object);
         const float vertices[] = { 0.5, 1.0, 0.0, 0.0, 1.0, 0.0 };
-        glVertexAttribPointer(position_location, 2, GL_FLOAT, GL_FALSE, 0, vertices);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        glVertexAttribPointer(position_location, 2, GL_FLOAT, GL_FALSE, 0, 0);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         glBindBuffer(GL_ARRAY_BUFFER, old_buffer_binding);
         glEnable(GL_BLEND);
     }
 
-    void teardown() { glDeleteProgram(program); }
+    void teardown() { glDeleteProgram(program); glDeleteBuffers(1, &vertex_buffer_object); }
 
     slint::ComponentWeakHandle<slint::interpreter::ComponentInstance> app_weak;
     GLuint program = 0;
     GLuint position_location = 0;
+    GLuint vertex_buffer_object = 0;
 };
 
 int main()
