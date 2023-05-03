@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <GLES2/gl2.h>
-#include <GLES2/gl2platform.h>
+#include <GLES3/gl3.h>
+#include <GLES3/gl3platform.h>
 
 static GLint compile_shader(GLuint program, GLuint shader_type, const GLchar *const *source)
 {
@@ -100,6 +100,7 @@ private:
 
         position_location = glGetAttribLocation(program, "position");
         glGenBuffers(1, &vertex_buffer_object);
+        glGenVertexArrays(1, &vertex_array_object);
     }
 
     void after()
@@ -112,6 +113,11 @@ private:
         }
         glDisable(GL_BLEND);
         glUseProgram(program);
+
+        GLint old_vertex_array;
+        glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &old_vertex_array);
+        glBindVertexArray(vertex_array_object);
+
         glEnableVertexAttribArray(position_location);
         GLint old_buffer_binding = 0;
         glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &old_buffer_binding);
@@ -121,15 +127,21 @@ private:
         glVertexAttribPointer(position_location, 2, GL_FLOAT, GL_FALSE, 0, 0);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         glBindBuffer(GL_ARRAY_BUFFER, old_buffer_binding);
+        glBindVertexArray(old_vertex_array);
         glEnable(GL_BLEND);
     }
 
-    void teardown() { glDeleteProgram(program); glDeleteBuffers(1, &vertex_buffer_object); }
+    void teardown() {
+        glDeleteProgram(program);
+        glDeleteBuffers(1, &vertex_buffer_object);
+        glDeleteVertexArrays(1, &vertex_array_object);
+    }
 
     slint::ComponentWeakHandle<slint::interpreter::ComponentInstance> app_weak;
     GLuint program = 0;
     GLuint position_location = 0;
     GLuint vertex_buffer_object = 0;
+    GLuint vertex_array_object = 0;
 };
 
 int main()
